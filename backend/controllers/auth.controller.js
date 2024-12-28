@@ -7,7 +7,7 @@ import { ENV_VARS } from "../env/envVars.js";
 import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
-    const { username, email, password, confirmPassword } = req.body;
+    const { username, email, password, confirmPassword,role } = req.body;
     try {
         if (!username || !email || !password || !confirmPassword) {
             return res.status(400).json({
@@ -36,7 +36,8 @@ export const registerUser = async (req, res) => {
             username,
             email,
             password,
-            confirmPassword
+            confirmPassword,
+            role
         });
 
         await newUser.save();
@@ -149,5 +150,20 @@ export const refreshToken = async (req, res) => {
 }
 
 export const getUserProfile = async (req, res) => {
-    
+    try {
+        const user = req.user;
+        return res.status(200).json({
+            status: 'success',
+            data: {
+                ...user._doc,
+                password: undefined,
+            }
+        })
+    } catch (error) {
+        console.log('Error in getUserProfile controller : ' + error.message);
+        return res.status(500).json({
+            status: 'failed',
+            message: error.message,
+        });
+    }
 }
