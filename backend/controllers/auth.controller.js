@@ -146,7 +146,48 @@ export const logoutUser = async (req, res) => {
 }
 
 export const refreshToken = async (req, res) => {
+    try {
+        const refreshToken = req.cookies['refresh-token'];
+        if (!refreshToken) {
+            return res.status(401).json({
+                status: 'failed',
+                message: "Unauthorized! No refresh token is provided"
+            });
+        }
 
+        const decoded = await jwt.verify(refreshToken, ENV_VARS.REFRESH_TOKEN);
+        const storedTokeninCache = await redis.get(`refreshToken:${decoded.id}`);
+
+        if(refreshToken !== storedTokeninCache)
+        {
+            return res.status(401).json({
+                status: 'failed',
+                message: "Unauthorized! Invalid refresh token"
+            });
+        }
+
+        const accessToken = await jwt.sign({ id: decoded.id }, ENV_VARS.ACCESS_TOKEN, {
+            expiresIn: '15m'
+        });
+
+        res.cookie("access-token",accessToken, {
+            httpOnly: true,
+            secure: ENV_VARS.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            message: "Token refreshed successfully"
+        });
+    } catch (error) {
+        console.log('Error in refreshToken controller : ' + error.message);
+        return res.status(500).json({
+            status: 'failed',
+            message: error.message,
+        });
+    }
 }
 
 export const getUserProfile = async (req, res) => {
@@ -167,3 +208,6 @@ export const getUserProfile = async (req, res) => {
         });
     }
 }
+
+
+
