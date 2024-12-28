@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import validator, { trim } from 'validator';
+import validator from 'validator';
 import brcypt from 'bcryptjs';
 
 
@@ -32,11 +32,11 @@ const userSchema=new mongoose.Schema({
             message:'Password must contain at least one uppercase letter, one number, and one special character'
         }
     },
-    comparePassword: {
+    confirmPassword: {
         type: String,
         required:[true,'Please confirm your password'],
         validate: {
-            validator: (value)=> {
+            validator:function (value) {
                 return value === this.password;
             },
             message: 'Passwords do not match!'
@@ -61,21 +61,17 @@ const userSchema=new mongoose.Schema({
     }    
 },{timestamps:true});
 
-userSchema.pre("save",async (next)=>{
+userSchema.pre("save",async function(next){
     if(!this.isModified("password"))
         return next();
-    try {
         const salt=await brcypt.genSalt(10);
         this.password=await brcypt.hash(this.password,salt);
-        this.comparePassword=undefined;
+        this.confirmPassword=undefined;
         next();
-    } catch (error) {
-        next(error);
-    }
-})
+});
 
 
-userSchema.methods.comparePassword=async (enteredPassword,originalPassword)=>{
+userSchema.methods.comparePassword=async function (enteredPassword,originalPassword){
     return await brcypt.compare(enteredPassword,originalPassword);
 }
 
