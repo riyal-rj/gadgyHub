@@ -42,4 +42,18 @@ export const protectedRoute = async (req, res, next) => {
                 message: error.message,
             });
         }
-    }
+}
+
+export const adminRoute=async(req,res,next)=>{
+        if(req.user && req.user.role === 'admin')
+        {
+            next();
+        }
+        else
+        {
+            res.status(403).json({
+            status:'failed',
+            message:'Forbidden! Only admin can access this route'
+            })
+        }
+}
