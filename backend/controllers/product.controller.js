@@ -116,6 +116,21 @@ export const getProductsByCategory=async(req,res)=>{
 
 export const addProduct=async(req,res)=>{
     try {
+        const {name,description,price,category,images}=req.body;
+
+        if(!name || !description || !price || !category || !images)
+        {
+            return res.status(400).json({
+                status:"failed",
+                message:"Please fill all the required fields"
+            });
+        }
+        if (!Product.schema.path('category').enumValues.includes(category)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid category entered"
+            });
+        }
         
     } catch (error) {
         console.log('Error in addProduct controller : '+error.message);

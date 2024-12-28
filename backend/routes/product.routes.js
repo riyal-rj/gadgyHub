@@ -7,6 +7,8 @@ router.get('/featured',getAllFeaturedProducts);
 router.get('/recommended',getAllRecommendedProducts);
 router.get('/category/:category',getProductsByCategory);
 
+//admin only routes
 router.get('/',protectedRoute,adminRoute,getAllProducts);
+router.post('/',protectedRoute,adminRoute,addProduct);
 
 export default router;
