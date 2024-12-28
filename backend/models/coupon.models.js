@@ -21,6 +21,16 @@ const couponSchema = new mongoose.Schema({
             },
             message: 'Expiry date must be in the future'
         }
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    userId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required:[true,'Please enter user'],
+        unique: true
     }
 },
     {
