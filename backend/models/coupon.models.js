@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const couponSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Please enter coupon name'],
+        unique: true
+    },
     code: {
         type: String,
         required: [true, 'Please enter coupon code'],
@@ -26,11 +31,9 @@ const couponSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    userId:{
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required:[true,'Please enter user'],
-        unique: true
     }
 },
     {

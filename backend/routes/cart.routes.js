@@ -5,7 +5,7 @@ import { addToCart, getAllProdsFromCart, removeAllFromCart, updateQuantity,  } f
 
 const router=express.Router();
 
-router.get('/',getAllProdsFromCart);
+router.get('/',protectedRoute,getAllProdsFromCart);
 router.post('/',protectedRoute,addToCart)
 router.delete('/',protectedRoute,removeAllFromCart);
 router.put('/:id',protectedRoute,updateQuantity);

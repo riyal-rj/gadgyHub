@@ -1,5 +1,34 @@
 import Product from "../models/product.models.js";
 
+
+export const getAllProdsFromCart = async (req, res) => {
+    try {
+        const products = await Product.find({ _id: { $in: req.user.cartItems } });
+       
+         const cartItems=products.map((product) => ({
+            id: product._id,
+            name: product.name,
+            price: product.price,
+            quantity: req.user.cartItems.find((item) => item.equals(product._id)).quantity,
+            image: product.images
+        }));
+
+        res.status(200).json({
+            status: "success",
+            message: "Products fetched successfully from cart",
+            data: cartItems
+        })
+        
+    } catch (error) {
+        console.log('Error in getAllProdsFromCart controller : ' + error.message);
+        return res.status(500).json({   
+            status: "failed",
+            message: error.message
+        });
+    }
+}
+
+
 export const addToCart = async (req, res) => {
     try {
         const user = req.user;
@@ -100,5 +129,3 @@ export const updateQuantity = async (req, res) => {
     }
 }
 
-export const getAllProdsFromCart = async (req, res) => {
-}
