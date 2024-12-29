@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import { connectDB } from './db/mongo.db.config.js';
 import authRoutes from './routes/auth.routes.js'
 import productRoutes from './routes/product.routes.js'
+import cartRoutes from './routes/cart.routes.js'
 import morgan from 'morgan';
 const app=express();
 
@@ -14,7 +15,7 @@ app.use(morgan('dev'));
 
 app.use('/api/auth',authRoutes);
 app.use('/api/products',productRoutes);
-
+app.use('/api/cart',cartRoutes)
 
 connectDB();
 export default app;
