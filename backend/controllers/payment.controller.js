@@ -134,6 +134,14 @@ async function createCoupon(userId)
 export const checkoutSuccess = async (req, res) => {
     try {
         const {sessionId} = req.id;
+        if(!sessionId)
+        {
+            return res.status(404).json({
+                status: "failed",
+                message: "Session id required"
+            });
+        }
+
         const session = await stripe.checkout.sessions.retrieve(sessionId);
         if(session.payment_status==="paid")
         {
@@ -141,7 +149,8 @@ export const checkoutSuccess = async (req, res) => {
             {
                 await Coupon.findOneAndUpdate({code:session.metadata.coupon},{isActive:false});
             }
-            const products = JSON.parse(session.metadata.products);
+            let products=null;
+            products = JSON.parse(session.metadata.products);
             const newOrder = new Order({
                 userId: session.metadata.userId,
                 products:products.map((product) => ({
