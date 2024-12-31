@@ -32,22 +32,6 @@ const orderSchema = new mongoose.Schema(
             required:[true,'Please enter total amount'],
             min:[1,'Total amount cannot be less than 1'],
         },
-        shippingAddress:{
-            type:String,
-            required:[true,'Please enter shipping address'],
-        },
-        paymentMethod:{
-            type:String,
-            required:[true,'Please enter payment method'],
-        },
-        paymentStatus:{
-            type:String,
-            required:[true,'Please enter payment status'],
-        },
-        isDelivered:{
-            type:Boolean,
-            required:[true,'Please enter isDelivered status'],
-        },
         stripePaymentId:{
             type:String,
             required:[true,'Please enter stripe payment id'],
