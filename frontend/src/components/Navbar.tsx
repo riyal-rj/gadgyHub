@@ -1,7 +1,7 @@
 import { ShoppingCart, UserPlus2, LogIn, LogOut, Lock,LucideShoppingBag} from 'lucide-react'
 import { Link } from 'react-router-dom'
 const Navbar = () => {
-    const user: boolean = true;
+    const user: boolean = false;
     const isAdmin: boolean = false;
     return (
         <header className='fixed top-0 left-0 w-full bg-[rgba(72,61,139,0.9)] bg-opacity-90 
