@@ -7,9 +7,10 @@ type AuthState={
     user:any,
     loading:boolean,
     checkingAuth:boolean,
-    signUp:(username:string,email:string,password:string,confirmPassword:string)=>void
-    login:(email:string,password:string)=>void
-    checkAuth:()=>void
+    signUp:(username:string,email:string,password:string,confirmPassword:string)=>void,
+    login:(email:string,password:string)=>void,
+    checkAuth:()=>void,
+    logout:()=>void,
 }
 export const useAuthStore=create<AuthState>((set,get)=>({
     user:null,
@@ -56,6 +57,21 @@ export const useAuthStore=create<AuthState>((set,get)=>({
         }
     },
 
+    logout:async ()=>{
+       try {
+        const res=await axiosInstance.post('/auth/logout');
+        set({user:null});
+        toast.success( res.data.message)
+       } catch (error) {
+        if(axios.isAxiosError(error) && error.response){
+            return toast.error(error.response.data.message || 'Something went wrong');
+        }
+        else
+        {
+            toast.error('Unexpected error occurred');
+        }
+       }
+    },
     checkAuth:async ()=>{
         set({checkingAuth:true});
         try 

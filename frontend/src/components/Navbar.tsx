@@ -1,15 +1,17 @@
-import { ShoppingCart, UserPlus2, LogIn, LogOut, Lock,LucideShoppingBag} from 'lucide-react'
+import { ShoppingCart, UserPlus2, LogIn, LogOut, Lock,ComputerIcon} from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore.ts';
 const Navbar = () => {
-    const user: boolean = false;
-    const isAdmin: boolean = false;
+    const {user,logout} = useAuthStore();
+    console.log(user);
+    const isAdmin=user?.role==='admin';
     return (
         <header className='fixed top-0 left-0 w-full bg-[rgba(72,61,139,0.9)] bg-opacity-90 
         backdrop-blur-md shadow-lg z-40 transition-all duration-300 border-b border-[rgba(255,215,0,0.7)]'>
             <div className='flex flex-wrap items-center justify-between px-4 py-2'>
             <Link to={'/'} className='text-2xl font-bold text-white items-center space-x-2 flex'>
-                <span>e-Kart</span> 
-                <LucideShoppingBag className='text-[rgba(255,215,0,0.9)]' />
+                <span>byte-Mart</span> 
+                <ComputerIcon className='text-[rgba(255,215,0,0.9)]' />
             </Link>
 
             <nav className='flex flex-wrap items-center gap-4'>
@@ -41,9 +43,10 @@ const Navbar = () => {
                     user ? (
                         <button
                             className='bg-[rgba(72,61,139,0.9)] hover:bg-[rgba(72,61,139,0.7)] text-[rgba(255,215,0,0.9)] py-2 px-4 rounded- md flex items-center transition duration-300 ease-in-out shadow-md'
-                            onClick={() => { }}
+                            onClick={logout}
                         >
-                            <LogOut size={18} />
+                            <LogOut size={18} 
+                            />
                             <span className='hidden sm:inline ml-2'>Log Out</span>
                         </button>
                     ) : (

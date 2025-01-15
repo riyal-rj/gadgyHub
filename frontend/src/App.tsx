@@ -6,13 +6,19 @@ import Navbar from "./components/Navbar.tsx"
 import { Toaster } from "react-hot-toast"
 import { useAuthStore } from "./store/authStore.ts"
 import { useEffect } from "react"
+import LoadingSpinner from "./components/LoadingSpinner.tsx"
+import AdminPage from "./pages/AdminPage.tsx"
 
 function App() {
-  const {user,checkAuth}=useAuthStore();
+  const {user,checkAuth,checkingAuth}=useAuthStore();
 
   useEffect(() => {
     checkAuth();
   },[checkAuth]);
+
+  if(checkingAuth)
+    return <LoadingSpinner/>
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
@@ -29,6 +35,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={ !user? <LoginPage />: <Navigate to={'/'} />} />
           <Route path="/signup" element={!user?<SignUpPage />: <Navigate to={'/'} />} />
+          <Route path="/admin-dashboard" element={user?.role==='admin'? <AdminPage/>: <Navigate to={'/login'}/>}/>
         </Routes>
       </div>
       <Toaster/>

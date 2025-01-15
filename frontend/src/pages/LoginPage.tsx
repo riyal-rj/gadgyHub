@@ -32,7 +32,7 @@ const LoginPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
     >
-        <div className='bg-[rgba(44,44,84,0.9)] py-8 px-4 shadow-md sm:rounded-lg sm:px-10'>
+        <div className='bg-[rgba(72,61,139,0.9)] py-8 px-4 shadow-md sm:rounded-lg sm:px-10'>
             <form onSubmit={handleSubmit} className='space-y-6'>
                 <div>
                     <label htmlFor='identifier' className='block text-sm font-medium text-[rgba(255,215,0,0.9)]'>
