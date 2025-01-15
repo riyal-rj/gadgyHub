@@ -109,8 +109,10 @@ export const loginUser = async (req, res) => {
             status: 'success',
             message: "User logged in successfully",
             data: {
-                ...userExists._doc,
-                password: undefined,
+                user: {
+                    ...userExists._doc,
+                    password: undefined,
+                }
             }
         });
     } catch (error) {

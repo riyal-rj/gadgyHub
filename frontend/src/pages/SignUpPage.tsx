@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {UserPlus2,MailIcon,LockKeyhole,ArrowRight,Loader2Icon}from "lucide-react";
 import {motion} from "framer-motion";
+
+import { useAuthStore } from "../store/authStore.ts";
+
 const SignUpPage = () => {
-    const loading:boolean=false;
+   const {signUp,loading}=useAuthStore();
 
     const [formData, setFormData] = useState({
         username: '',
@@ -12,9 +15,16 @@ const SignUpPage = () => {
         confirmPassword: '',
     });
 
+    
     const handleSubmit=(e:React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
-        console.log(formData)
+        console.log(formData);
+        signUp(
+            formData.username,
+            formData.email,
+            formData.password,
+            formData.confirmPassword
+        );
     }
 
   return (

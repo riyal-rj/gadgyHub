@@ -2,15 +2,16 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { LogIn, LockKeyholeIcon, ArrowRight, Loader2, User2Icon } from "lucide-react";
+import { useAuthStore } from "../store/authStore.ts";
 const LoginPage = () => {
-    const loading:boolean=false;
-
     const [emailOrUsername, setEmailOrUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
+    const { login, loading } = useAuthStore();
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(emailOrUsername, password);
+        login(emailOrUsername, password);
     };
   return (
     <div className='flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
