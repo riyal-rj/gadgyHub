@@ -1,35 +1,56 @@
 import {useState} from 'react'
 import { motion } from 'framer-motion'
 import { PlusSquareIcon,UploadIcon,LoaderPinwheel } from 'lucide-react'
-const categories=["Electronics","Phones","Accessories","Laptops","HeadPhones","Laptops"]
+import { useProductStore } from '../store/productStore.ts'
+const categories=["Electronics","Phones","Accessories","Laptops","HeadPhones","Cameras"]
 const AddProductForm = () => {
     const [newProduct,setAddNewProduct]=useState({
+        _id:"",
         name:"",
         description:"",
         price:"",
         category:"",
         avgRatings:"",
-        image:""
+        images:[{
+            public_id:"",
+            url:""
+        }],
+        isFeatured:false,
     });
-
+    const {addProduct}=useProductStore();
     const loading:boolean=false;
     const handleSubmit=async(e:React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
-        console.log(name);
+       try {
+         await addProduct(newProduct);
+         setAddNewProduct({_id:"",name:"",description:"",price:"",category:"",avgRatings:"",images:[],isFeatured:false});
+       } catch (error) {
+        console.log('Error while adding product : ' );
+       }
     }
 
-    const handleImageChange = (e:any) => {
-		const file = e.target.files[0];
-		if (file) {
-			const reader = new FileReader();
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
 
-			reader.onloadend = () => {
-				// setAddNewProduct({ ...newProduct, image: reader.result });
-			};
+          reader.onloadend = () => {
+              if (typeof reader.result === "string") {
+                  const newImage = {
+                      public_id: `image_${Date.now()}`, // Unique ID
+                      url: reader.result,
+                  };
+                  console.log(newImage);
+                  setAddNewProduct({
+                      ...newProduct,
+                     images:[newImage]
+                  })
+              }
+          };
 
-			reader.readAsDataURL(file); // base64
-		}
-	};
+          reader.readAsDataURL(file);
+      }
+  };
   return (
     <motion.div
   className='bg-[rgba(72,61,139,0.9)] shadow-lg rounded-lg p-8 mb-8 max-w-xl mx-auto'
@@ -100,6 +121,26 @@ const AddProductForm = () => {
       />
     </div>
 
+    {/* Average Ratings */}
+    <div>
+      <label htmlFor='avgRatings' className='block text-sm font-medium text-[rgba(255,215,0,0.9)]'>
+        Average Rating
+      </label>
+      <input
+        type='number'
+        id='avgRatings'
+        name='avgRatings'
+        value={newProduct.avgRatings}
+        onChange={(e) => setAddNewProduct({ ...newProduct, avgRatings: e.target.value })}
+        step='0.01'
+        className='mt-1 block w-full bg-[rgba(44,44,84,0.9)] border border-[rgba(72,61,139,0.7)] rounded-md shadow-sm 
+        py-2 px-3 text-[rgba(255,215,0,0.9)] placeholder-[rgba(255,215,0,0.6)] focus:outline-none 
+        focus:ring-[rgba(255,215,0,0.8)] focus:border-[rgba(255,215,0,0.8)]'
+        placeholder='Enter Average Rating'
+        required
+      />
+    </div>
+
     {/* Category */}
     <div>
       <label htmlFor='category' className='block text-sm font-medium text-[rgba(255,215,0,0.9)]'>
@@ -142,11 +183,11 @@ const AddProductForm = () => {
         <UploadIcon className='h-5 w-5 inline-block mr-2' />
         Upload Image
       </label>
-      {newProduct.image && (
+      {newProduct.images.length > 0 && (
         <span className='ml-3 text-sm text-[rgba(255,215,0,0.6)]'>Image uploaded</span>
       )}
     </div>
-
+    
     {/* Submit Button */}
     <button
       type='submit'

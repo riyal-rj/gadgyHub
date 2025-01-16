@@ -77,13 +77,14 @@ export const useAuthStore=create<AuthState>((set,get)=>({
         try 
         {
             const res=await axiosInstance.get('/auth/profile');
+            // console.log(res.data);
             set({user:res.data.data,checkingAuth:false});
         }
         catch (error) 
         {
             set({checkingAuth:false,user:null});
             if(axios.isAxiosError(error) && error.response){
-                return toast.error(error.response.data.message || 'Something went wrong');
+                 toast.error(error.response.data.message || 'Something went wrong');
             }
             else
             {

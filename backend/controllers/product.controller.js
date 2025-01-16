@@ -115,7 +115,7 @@ export const getProductsByCategory = async (req, res) => {
 export const addProduct = async (req, res) => {
     try {
         const { name, description, price, category, avgRatings } = req.body;
-        const { prodImage } = req.body;
+        const { images } = req.body;
         if (!name || !description || !price || !category) {
             return res.status(400).json({
                 status: "failed",
@@ -128,10 +128,12 @@ export const addProduct = async (req, res) => {
                 message: "Invalid category entered"
             });
         }
-
+        console.log(images);
         let cloudinaryResposne = null;
-        if (prodImage) {
-            cloudinaryResposne = await cloudinary.uploader.upload(prodImage);
+        if (images && images.url) {
+            cloudinaryResposne = await cloudinary.uploader.upload(images.url,{
+                resource_type: "auto",
+            });
         }
         console.log(cloudinaryResposne);
         const newProduct = new Product({

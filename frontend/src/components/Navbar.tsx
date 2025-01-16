@@ -10,7 +10,7 @@ const Navbar = () => {
         backdrop-blur-md shadow-lg z-40 transition-all duration-300 border-b border-[rgba(255,215,0,0.7)]'>
             <div className='flex flex-wrap items-center justify-between px-4 py-2'>
             <Link to={'/'} className='text-2xl font-bold text-white items-center space-x-2 flex'>
-                <span>byte-Mart</span> 
+                <span>Nano-Nest</span> 
                 <ComputerIcon className='text-[rgba(255,215,0,0.9)]' />
             </Link>
 
