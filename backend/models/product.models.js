@@ -25,14 +25,9 @@ const productSchema = new mongoose.Schema({
         max:[5,'Ratings cannot exceed 5'],
         min:[1,'Ratings cannot be less than 1']
     },
-    images:[{
-        public_id:{
+    image:{
             type:String,
         },
-        url:{
-            type:String,
-        }
-    }],
     category:{
         type:String,
         required:[true,'Please select category for this product'],

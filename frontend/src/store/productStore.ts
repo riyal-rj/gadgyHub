@@ -9,10 +9,7 @@ interface Products{
     description:string,
     price:string,
     avgRatings:string,
-    images: {
-        public_id: string;
-        url: string;
-    }[],
+    image:string,
     category:string,
     isFeatured:boolean
 }

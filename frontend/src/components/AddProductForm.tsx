@@ -11,10 +11,7 @@ const AddProductForm = () => {
         price:"",
         category:"",
         avgRatings:"",
-        images:[{
-            public_id:"",
-            url:""
-        }],
+        image:"",
         isFeatured:false,
     });
     const {addProduct}=useProductStore();
@@ -23,7 +20,7 @@ const AddProductForm = () => {
         e.preventDefault();
        try {
          await addProduct(newProduct);
-         setAddNewProduct({_id:"",name:"",description:"",price:"",category:"",avgRatings:"",images:[],isFeatured:false});
+         setAddNewProduct({_id:"",name:"",description:"",price:"",category:"",avgRatings:"",image:"",isFeatured:false});
        } catch (error) {
         console.log('Error while adding product : ' );
        }
@@ -36,15 +33,7 @@ const AddProductForm = () => {
 
           reader.onloadend = () => {
               if (typeof reader.result === "string") {
-                  const newImage = {
-                      public_id: `image_${Date.now()}`, // Unique ID
-                      url: reader.result,
-                  };
-                  console.log(newImage);
-                  setAddNewProduct({
-                      ...newProduct,
-                     images:[newImage]
-                  })
+                  setAddNewProduct({ ...newProduct, image: reader.result });
               }
           };
 
@@ -183,7 +172,7 @@ const AddProductForm = () => {
         <UploadIcon className='h-5 w-5 inline-block mr-2' />
         Upload Image
       </label>
-      {newProduct.images.length > 0 && (
+      {newProduct.image.length > 0 && (
         <span className='ml-3 text-sm text-[rgba(255,215,0,0.6)]'>Image uploaded</span>
       )}
     </div>

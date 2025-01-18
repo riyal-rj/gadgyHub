@@ -58,7 +58,7 @@ export const getAllRecommendedProducts = async (req, res) => {
                     name: 1,
                     description: 1,
                     price: 1,
-                    images: 1,
+                    image: 1,
                     avgRatings: 1
                 }
             }
@@ -115,7 +115,7 @@ export const getProductsByCategory = async (req, res) => {
 export const addProduct = async (req, res) => {
     try {
         const { name, description, price, category, avgRatings } = req.body;
-        const { images } = req.body;
+        const { image } = req.body;
         if (!name || !description || !price || !category) {
             return res.status(400).json({
                 status: "failed",
@@ -128,23 +128,28 @@ export const addProduct = async (req, res) => {
                 message: "Invalid category entered"
             });
         }
-        console.log(images);
-        let cloudinaryResposne = null;
-        if (images && images.url) {
-            cloudinaryResposne = await cloudinary.uploader.upload(images.url,{
-                resource_type: "auto",
-            });
+        console.log(image);
+        let cloudinaryResponse = null;
+        if (image ) {
+            try {
+                cloudinaryResponse = await cloudinary.uploader.upload(image, {
+                    resource_type: "image",
+                });
+            } catch (error) {
+                console.error("Cloudinary upload error:", error);
+                return res.status(500).json({
+                    status: "failed",
+                    message: "Failed to upload image to Cloudinary",
+                });
+            }
         }
-        console.log(cloudinaryResposne);
+        console.log(cloudinaryResponse);
         const newProduct = new Product({
             name,
             description,
             price,
             category,
-            images: {
-                public_id: cloudinaryResposne?.public_id,
-                url: cloudinaryResposne?.secure_url
-            },
+            image: cloudinaryResponse.secure_url,
             avgRatings
         });
 
@@ -177,9 +182,9 @@ export const deleteProduct = async (req, res) => {
             });
         }
 
-        if(product.images)
+        if(product.image)
         {
-            const publicid=product.images.public_id;
+            const publicid=product.image;
             try {
                 await cloudinary.uploader.destroy(`products/${publicid}`);
                 console.log(`Deleted image with public_id from cloudinary: ${publicid}`);
