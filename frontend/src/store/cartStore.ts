@@ -1,9 +1,9 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 import axiosInstance from '../lib/axios';
-import {toast} from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
-type Cart={
+type Cart = {
     _id: string,
     name: string,
     description: string,
@@ -12,166 +12,168 @@ type Cart={
     avgRatings: string,
     image: string,
     isFeatured: boolean
-    quantity:number
+    quantity: number
 }
 type Coupon = {
     discount: number;
 }
-interface CartState{
-    cartItems:Cart[];
-    coupon:Coupon|null,
-    totalAmount:number,
-    subtotalAmount:number,
-    isCouponApplied:boolean,
-    addToCart:(product:Cart)=>void,
-    removeFromCart:(id:string)=>void,
-    getCoupon:()=>void,
-    applyCoupon:(couponCode:string)=>void,
-    removeCoupon:()=>void,
-    getCartItems:()=>void,
-    calculateTotalAmount:()=>void,
-    updateQuantity:(id:string,quantity:number)=>void,
-    clearCart:()=>void,
+interface CartState {
+    cartItems: Cart[];
+    coupon: Coupon | null,
+    totalAmount: number,
+    subtotalAmount: number,
+    isCouponApplied: boolean,
+    addToCart: (product: Cart) => void,
+    removeFromCart: (id: string) => void,
+    getCoupon: () => void,
+    applyCoupon: (couponCode: string) => void,
+    removeCoupon: () => void,
+    getCartItems: () => void,
+    calculateTotalAmount: () => void,
+    updateQuantity: (id: string, quantity: number) => void,
+    clearCart: () => void,
 }
-export const useCartStore=create<CartState>((set,get)=>({
-    cartItems:[],
-    coupon:null,
-    totalAmount:0,
-    subtotalAmount:0,
-    isCouponApplied:false,
-    addToCart:async (product:Cart)=>{
+export const useCartStore = create<CartState>((set, get) => ({
+    cartItems: [],
+    coupon: null,
+    totalAmount: 0,
+    subtotalAmount: 0,
+    isCouponApplied: false,
+    getCoupon: async () => {
         try {
-            await axiosInstance.post('/cart',{productId:product._id});
-            toast.success('Product added to cart successfully');
-            set((previousState)=>{
-                const existingItem=previousState.cartItems.findIndex(item=>item._id===product._id);
-                if(existingItem>-1){
-                    previousState.cartItems[existingItem].quantity++;
-                }
-                else
-                {
-                    previousState.cartItems.push({...product,quantity:1});
-                }
-                get().calculateTotalAmount();
-                return {...previousState};
-            });
-        } catch (error) {
-            if(axios.isAxiosError(error) && error.response){
+            const res = await axiosInstance.get(`/coupons`);
+            set({ coupon: res.data.data.coupon });
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
                 return toast.error(error.response.data.message || 'Something went wrong');
             }
-            else
-            {
+            else {
                 toast.error('Unexpected error occurred');
             }
         }
     },
-    removeFromCart:async (productId:string)=>{
+    applyCoupon: async (couponCode: string) => {
         try {
-            const res=await axiosInstance.delete(`/cart/`,{data:{productId}});
-            toast.success(res.data.message);
-            set((previousState)=>{
-                const existingItem=previousState.cartItems.findIndex(item=>item._id===productId);
-                if(existingItem>-1){
-                    previousState.cartItems.splice(existingItem,1);
-                }
-                get().calculateTotalAmount();
-                return {...previousState};
-            });
+            const res = await axiosInstance.post('/coupons/validate', { couponCode });
+            set({ coupon: res.data.data.coupon, isCouponApplied: true });
+            get().calculateTotalAmount();
+            toast.success('Coupon applied successfully');
         } catch (error) {
-            if(axios.isAxiosError(error) && error.response){
+            if (axios.isAxiosError(error) && error.response) {
                 return toast.error(error.response.data.message || 'Something went wrong');
             }
-            else
-            {
+            else {
                 toast.error('Unexpected error occurred');
             }
         }
     },
-    removeCoupon:async ()=>{
-        set({coupon:null,isCouponApplied:false});
+    removeCoupon: async () => {
+        set({ coupon: null, isCouponApplied: false });
         get().calculateTotalAmount();
         toast.success('Coupon removed successfully');
     },
-    applyCoupon:async(couponCode:string)=>{
+
+    getCartItems: async () => {
         try {
-            const res=await axiosInstance.post('/coupons/validate',{couponCode});
-            set({isCouponApplied:true});
+            const res = await axiosInstance.get('/cart');
+            set({ cartItems: res.data.data.cart });
             get().calculateTotalAmount();
-            toast.success(res.data.message);
+        }
+        catch (error) {
+            set({ cartItems: [] });
+            if (axios.isAxiosError(error) && error.response) {
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+            else {
+                toast.error('Unexpected error occurred');
+            }
+        }
+    },
+    clearCart: async () => {
+        set({ cartItems: [], coupon: null, totalAmount: 0, subtotalAmount: 0 });
+    },
+    addToCart: async (product: Cart) => {
+        try {
+            await axiosInstance.post('/cart', { productId: product._id });
+            toast.success('Product added to cart successfully');
+
+            set((previousState) => {
+                const existingItem = previousState.cartItems.find(item => item._id === product._id);
+                const newCart = existingItem ?
+                    previousState.cartItems.map(item =>
+                        item._id === product._id ?
+                            { ...item, quantity: item.quantity + 1 }
+                            : item
+                    )
+                    :
+                    [...previousState.cartItems, { ...product, quantity: 1 }];
+                return { cartItems: newCart };
+            });
+            get().calculateTotalAmount();
         } catch (error) {
-            if(axios.isAxiosError(error) && error.response){
+            if (axios.isAxiosError(error) && error.response) {
                 return toast.error(error.response.data.message || 'Something went wrong');
             }
-            else
-            {
+            else {
                 toast.error('Unexpected error occurred');
             }
         }
     },
-    calculateTotalAmount:async()=>{
-        const {cartItems}=get();
-        let totalAmount:number=0;
-        let subtotalAmount:number=0;
-        for(let i=0;i<cartItems.length;i++)
-        {
-            totalAmount+=Number(cartItems[i].price)*cartItems[i].quantity;
-            subtotalAmount+=Number(cartItems[i].price)*cartItems[i].quantity;
-        }
-        if(get().isCouponApplied)
-        {
-            totalAmount-=(totalAmount*Number(get().coupon?.discount))/100;
-        }
-        set({totalAmount:totalAmount,subtotalAmount:subtotalAmount});
-        
-    },
-    getCoupon:async ()=>{
-        try{
-            const res=await axiosInstance.get(`/coupons`);
-            set({coupon:res.data.data.coupon});
-        }
-        catch(error){
-            if(axios.isAxiosError(error) && error.response){
-                return toast.error(error.response.data.message || 'Something went wrong');
-            }
-            else
-            {
-                toast.error('Unexpected error occurred');
-            }
-        }
-    },
-    getCartItems:async()=>{
-        try
-        {
-            const res=await axiosInstance.get('/cart');
-            set({cartItems:res.data.data.cart});
+
+    removeFromCart: async (productId: string) => {
+        try {
+            await axiosInstance.delete(`/cart/`, { data: { productId } });
+            set((previousState) => ({
+                cartItems: previousState.cartItems.filter(item => item._id !== productId),
+            }));
             get().calculateTotalAmount();
-        }
-        catch(error)
-        {
-            if(axios.isAxiosError(error) && error.response){
+            toast.success('Product removed from cart successfully');
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
                 return toast.error(error.response.data.message || 'Something went wrong');
             }
-            else
-            {
+            else {
                 toast.error('Unexpected error occurred');
             }
         }
     },
-    updateQuantity:async(productId:string,quantity:number)=>{
-        if(quantity===0)
-        {
+
+    updateQuantity: async (productId: string, quantity: number) => {
+        if (quantity === 0) {
             get().removeFromCart(productId);
+            return;
         }
-        else
-        {
-            const res=await axiosInstance.put(`/cart/${productId}`,{quantity});
-            toast.success(res.data.message);
+        else {
+            const res = await axiosInstance.put(`/cart/${productId}`, { quantity });
+            set(previousState => ({
+                cartItems: previousState.cartItems.map(item => item._id === productId ? res.data.data : item),
+            }));
             get().calculateTotalAmount();
+            toast.success('Quantity updated successfully');
         }
     },
-    clearCart:async()=>{
-        set({cartItems:[],totalAmount:0,subtotalAmount:0});
+
+
+    calculateTotalAmount: async () => {
+        const { cartItems, coupon } = get();
+        const safeCartItems = cartItems || []; // Fallback to an empty array
+        const subtotalAmount = safeCartItems.reduce(
+            (sum, item) => sum + parseFloat(item.price) * item.quantity,
+            0
+        );
+        let totalAmount = subtotalAmount;
+
+        if (coupon) {
+            const discount = (totalAmount * coupon.discount) / 100;
+            totalAmount -= discount;
+        }
+
+        set({ subtotalAmount, totalAmount });
+
     },
-    
+
+
+
 
 }))
