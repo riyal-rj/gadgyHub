@@ -1,12 +1,12 @@
 import CategoryItem from "../components/CategoryItem";
 
 const categories = [
-  { href: "/electronics", name: "Electronics", imageUrl: "/electronics.webp" },
-  { href: "/cameras", name: "Cameras", imageUrl: "/cameras.avif" },
-  { href: "/laptops", name: "Laptops", imageUrl: "/laptops.webp" },
-  { href: "/accessories", name: "Accessories", imageUrl: "/accessories.avif" },
-  { href: "/headphones", name: "Headphones", imageUrl: "/headphones.jpg" },
-  { href: "/phones", name: "Phones", imageUrl: "/phones.jpg" },
+  { href: "/Electronics", name: "Electronics", imageUrl: "/electronics.webp" },
+  { href: "/Cameras", name: "Cameras", imageUrl: "/cameras.avif" },
+  { href: "/Laptops", name: "Laptops", imageUrl: "/laptops.webp" },
+  { href: "/Accessories", name: "Accessories", imageUrl: "/accessories.avif" },
+  { href: "/Headphones", name: "Headphones", imageUrl: "/headphones.jpg" },
+  { href: "/Phones", name: "Phones", imageUrl: "/phones.jpg" },
 ];
 
 const Home = () => {

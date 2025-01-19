@@ -19,9 +19,10 @@ type productState={
   
     setProducts:(products:Products[])=>void,
     addProduct:(productData:Products)=>void,
-    deleteProduct:(id:string)=>void,
-    toggleFeaturedProduct:(id:string)=>void,
+    deleteProduct:(productId:string)=>void,
+    toggleFeaturedProduct:(productId:string)=>void,
     fetchAllProducts:()=>void,
+    fetchProductsByCategory:(category:string)=>void
     
 }
 
@@ -50,13 +51,72 @@ export const useProductStore=create<productState>((set)=>({
             }
         }
     },
-
-    deleteProduct:async(id)=>{
-        console.log(id);
+    deleteProduct:async(productId)=>{
+        set({loading:true});
+        try
+        {
+            const res=await axiosInstance.delete(`/products/${productId}`);
+            set(previousState=>({
+                products:previousState.products.filter(product=>product._id!==productId),
+                loading:false
+            }));
+            toast.success(res.data.message);
+        }
+        catch(error)
+        {
+            set({loading:false});
+            if(axios.isAxiosError(error) && error.response){
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+            else
+            {
+                toast.error('Unexpected error occurred');
+            }
+        }
     },
-
-    toggleFeaturedProduct:async(id)=>{
-        console.log(id);
+    fetchProductsByCategory: async (category) => {
+        set({ loading: true });
+        try 
+        {
+            category=category.charAt(0).toUpperCase()+category.slice(1);
+            const res = await axiosInstance.get(`/products/category/${category}`);
+            console.log(res.data);
+            set({ products: res.data.data.products, loading: false });
+        }
+        catch (error) {
+            set({ loading: false });
+            if (axios.isAxiosError(error) && error.response) {
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+            else
+            {
+                toast.error('Unexpected error occurred');
+            }
+        }
+    },
+    toggleFeaturedProduct:async(productId)=>{
+        set({loading:true});
+        try
+        {
+            const res=await axiosInstance.patch(`/products/${productId}`);
+            set(previousState=>({
+                products:previousState.products.map(product=>
+                    product._id===productId?res.data.data:product),
+            }));
+            toast.success(res.data.message);
+            set({loading:false});
+        }
+        catch(error)
+        {
+            set({loading:false});
+            if(axios.isAxiosError(error) && error.response){
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+            else
+            {
+                toast.error('Unexpected error occurred');
+            }
+        }
     },
 
     fetchAllProducts:async()=>{

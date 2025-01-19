@@ -82,7 +82,6 @@ export const getAllRecommendedProducts = async (req, res) => {
 export const getProductsByCategory = async (req, res) => {
     try {
         const { category } = req.params;
-
         if (!Product.schema.path('category').enumValues.includes(category)) {
             return res.status(400).json({
                 status: "failed",
@@ -91,17 +90,19 @@ export const getProductsByCategory = async (req, res) => {
         }
 
         const products = await Product.find({ category });
+        console.log(typeof products);
         if (products.length === 0) {
             return res.status(404).json({
                 status: "failed",
                 message: "Sorry No products found below this category"
             });
         }
+        
         res.status(200).json({
             status: "success",
             noOfProducts: products.length,
             category: category,
-            data: products
+            data: {products}
         });
     } catch (error) {
         console.log('Error in getProductsByCategory controller : ' + error.message);
