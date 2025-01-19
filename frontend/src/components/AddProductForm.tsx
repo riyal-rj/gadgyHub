@@ -13,6 +13,7 @@ const AddProductForm = () => {
     avgRatings: "",
     image: "",
     isFeatured: false,
+    quantity:0
   });
   const { addProduct } = useProductStore();
   const loading: boolean = false;
@@ -20,7 +21,7 @@ const AddProductForm = () => {
     e.preventDefault();
     try {
       await addProduct(newProduct);
-      setAddNewProduct({ _id: "", name: "", description: "", price: "", category: "", avgRatings: "", image: "", isFeatured: false });
+      setAddNewProduct({ _id: "", name: "", description: "", price: "", category: "", avgRatings: "",quantity:0, image: "", isFeatured: false });
     } catch (error) {
       console.log('Error while adding product : ');
     }

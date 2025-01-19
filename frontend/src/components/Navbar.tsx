@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore.ts';
 const Navbar = () => {
     const {user,logout} = useAuthStore();
-    console.log(user);
     const isAdmin=user?.role==='admin';
     return (
         <header className='fixed top-0 left-0 w-full bg-[rgba(72,61,139,0.9)] bg-opacity-90 
@@ -21,7 +20,7 @@ const Navbar = () => {
                         <Link to={'/cart'} className='relative group'>
                             <ShoppingCart className='text-[rgba(255,215,0,0.9)] hover:text-[rgba(72,61,139,0.9)]' />
                             <span className='hidden sm:inline text-[rgba(255,215,0,0.9)]'>Cart</span>
-                            <span className='absolute top-0 right-0 w-4 h-4 text-xs text-white bg-[rgba(255,69,58,0.9)] rounded-full flex items-center justify-center'>0</span>
+                            <span className='absolute top-0 right-0 w-4 h-4 text-xs text-white bg-[rgba(255,69,58,0.9)] rounded-full flex items-center justify-center'>{user?user.cartItems.length:0}</span>
                         </Link>
                     )
                 }

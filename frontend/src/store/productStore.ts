@@ -11,7 +11,8 @@ interface Products{
     avgRatings:string,
     image:string,
     category:string,
-    isFeatured:boolean
+    isFeatured:boolean,
+    quantity:number
 }
 type productState={
     products:Products[],

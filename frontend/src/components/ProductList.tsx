@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { StarIcon,Trash2Icon } from "lucide-react";
+import { HeartIcon,Trash2Icon } from "lucide-react";
 import { useProductStore } from "../store/productStore.ts";
 const ProductList = () => {
   const {deleteProduct,toggleFeaturedProduct,products}=useProductStore();
@@ -65,13 +65,16 @@ const ProductList = () => {
               </div>
             </div>
           </td>
+
           <td className='px-6 py-4 whitespace-nowrap'>
             <div className='text-sm text-[rgba(255,215,0,0.7)]'>
             ₹{product.price}</div>
           </td>
+
           <td className='px-6 py-4 whitespace-nowrap'>
             <div className='text-sm text-[rgba(255,215,0,0.7)]'>{product.category}</div>
           </td>
+
           <td className='px-6 py-4 whitespace-nowrap'>
             <button
               onClick={() => toggleFeaturedProduct(product._id)}
@@ -81,9 +84,10 @@ const ProductList = () => {
                   : "bg-[rgba(72,61,139,0.7)] text-[rgba(255,215,0,0.7)]"
               } hover:bg-[rgba(255,215,0,0.8)] transition-colors duration-200`}
             >
-              <StarIcon className='h-5 w-5' />
+              <HeartIcon className='h-5 w-5' />
             </button>
           </td>
+
           <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
             <button
               onClick={() => deleteProduct(product._id)}
@@ -92,6 +96,7 @@ const ProductList = () => {
               <Trash2Icon className='h-5 w-5' />
             </button>
           </td>
+          
         </tr>
       ))}
     </tbody>

@@ -9,6 +9,7 @@ import { useEffect } from "react"
 import LoadingSpinner from "./components/LoadingSpinner.tsx"
 import AdminPage from "./pages/AdminPage.tsx"
 import CategoryPage from "./pages/CategoryPage.tsx"
+import CartPage from "./pages/CartPage.tsx"
 
 function App() {
   const {user,checkAuth,checkingAuth}=useAuthStore();
@@ -38,6 +39,7 @@ function App() {
           <Route path="/signup" element={!user?<SignUpPage />: <Navigate to={'/'} />} />
           <Route path="/admin-dashboard" element={user?.role==='admin'? <AdminPage/>: <Navigate to={'/login'}/>}/>
           <Route path="/category/:category" element={<CategoryPage />} />
+          <Route path="/cart" element={<CartPage/>}/>
         </Routes>
       </div>
       <Toaster/>
