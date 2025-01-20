@@ -1,11 +1,12 @@
 import Product from "../models/product.models.js";
+import User from "../models/user.models.js";
 
 
 export const getAllProdsFromCart = async (req, res) => {
     try {
         const products = await Product.find({ _id: { $in: req.user.cartItems } });
-       
-         const cartItems=products.map((product) => ({
+
+        const cartItems = products.map((product) => ({
             _id: product._id,
             name: product.name,
             price: product.price,
@@ -19,10 +20,10 @@ export const getAllProdsFromCart = async (req, res) => {
             message: "Products fetched successfully from cart",
             data: cartItems
         })
-        
+
     } catch (error) {
         console.log('Error in getAllProdsFromCart controller : ' + error.message);
-        return res.status(500).json({   
+        return res.status(500).json({
             status: "failed",
             message: error.message
         });
@@ -70,18 +71,16 @@ export const addToCart = async (req, res) => {
 
 export const removeAllFromCart = async (req, res) => {
     try {
-        const {productId} = req.body;
+        const { productId } = req.body;
         const user = req.user;
-        if(!productId)
-        {
+        if (!productId) {
             user.cartItems = [];
         }
-        else
-        {
+        else {
             user.cartItems = user.cartItems.filter(item => item.id !== productId);
         }
         await user.save();
-        res.status(200).json({  
+        res.status(200).json({
             status: "success",
             message: "Cart cleared successfully",
             carts: user.cartItems
@@ -137,4 +136,30 @@ export const updateQuantity = async (req, res) => {
         });
     }
 }
+
+export const clearCartItems = async (req, res) => {
+    try {
+        console.log(req.user._id);
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                status: "failed",
+                message: "User not found",
+            });
+        }
+            user.cartItems = [];
+            await user.save();
+            res.status(200).json({
+                status: "success",
+                message: "Cart cleared successfully",
+                carts: user.cartItems
+            })
+        } catch (error) {
+            console.log('Error in clearCart controller : ' + error.message);
+            return res.status(500).json({
+                status: "failed",
+                message: error.message
+            });
+        }
+    }
 

@@ -5,7 +5,7 @@ import { adminRoute, protectedRoute } from '../middleware/auth.middleware.js';
 const router=express.Router();
 
 router.get('/', protectedRoute,getCoupons);
-router.get('/validate',protectedRoute,validateCoupon);
+router.post('/validate',protectedRoute,validateCoupon);
 
 //admin only operations
 router.post('/create',protectedRoute,adminRoute,createCoupon);

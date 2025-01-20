@@ -32,7 +32,7 @@ const orderSchema = new mongoose.Schema(
             required:[true,'Please enter total amount'],
             min:[1,'Total amount cannot be less than 1'],
         },
-        stripePaymentId:{
+        stripeSessionId:{
             type:String,
             required:[true,'Please enter stripe payment id'],
         },

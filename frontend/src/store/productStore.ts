@@ -18,6 +18,7 @@ type productState={
     products:Products[],
     loading:boolean,
     recomendedProducts:Products[],
+    featuredProducts:Products[],
     setProducts:(products:Products[])=>void,
     addProduct:(productData:Products)=>void,
     deleteProduct:(productId:string)=>void,
@@ -25,6 +26,7 @@ type productState={
     fetchAllProducts:()=>void,
     fetchProductsByCategory:(category:string)=>void
     fetchRecommendedProducts:()=>void
+    fetchFeaturedProducts:()=>void
     
 }
 
@@ -32,6 +34,7 @@ export const useProductStore=create<productState>((set)=>({
     products:[],
     loading:false,
     recomendedProducts:[],
+    featuredProducts:[],
     setProducts:(products)=>set({products}),
 
     addProduct:async(productData)=>{
@@ -150,4 +153,16 @@ export const useProductStore=create<productState>((set)=>({
             }
         }
     },
+    fetchFeaturedProducts: async () => {
+        set({ loading: true });
+        try {
+            const res = await axiosInstance.get('/products/featured');
+            set({ featuredProducts: res.data.data, loading: false });
+        } catch (error) {
+            set({ loading: false });
+            if (axios.isAxiosError(error) && error.response) {
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+        }
+    }
 }))

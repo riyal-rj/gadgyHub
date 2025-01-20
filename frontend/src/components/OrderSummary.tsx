@@ -1,16 +1,34 @@
-import { motion } from 'framer-motion'
-import { useCartStore } from '../store/cartStore'
+import { motion } from 'framer-motion';
+import { useCartStore } from '../store/cartStore';
 import { MoveRight, } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import {loadStripe} from '@stripe/stripe-js';
+import axiosInstance from '../lib/axios';
+const stripePromise=loadStripe('pk_test_51Qc9SrA3rQ23BCs54seJAq8vCag4gH2r1JYE1MVrk9phJyh9THJ9KhCBSkQa3D7azUCDA1MWQKr66eRltiw6BgX700Efm01MCT')
 const OrderSummary = () => {
-  const { totalAmount, subtotalAmount, coupon, isCouponApplied } = useCartStore();
+  const { totalAmount, subtotalAmount, coupon, isCouponApplied ,cartItems} = useCartStore();
   const savings = subtotalAmount - totalAmount;
-  const formattedTotalAmount = totalAmount.toFixed(2);
-  const formattedSubtotalAmount = subtotalAmount.toFixed(2);
-  const formattedSavings = savings.toFixed(2);
+  const formattedTotalAmount = totalAmount?.toFixed(2);
+  const formattedSubtotalAmount = subtotalAmount?.toFixed(2);
+  const formattedSavings = savings?.toFixed(2);
 
-
+  const handlePayment = async () => {
+   try {
+     const stripe=await stripePromise;
+     console.log(cartItems, coupon);
+     const res=await axiosInstance.post('/payments/checkout',{
+       listOfProducts:cartItems,
+       code:coupon?coupon.code : null,
+     });
+     const session=res.data;
+     console.log('Session: ',session);
+     const result=await stripe?.redirectToCheckout({sessionId:session.sessionId});
+     console.log(result);
+     
+   } catch (error) {
+     console.error(error);
+   }
+  }
 
   return (
     <motion.div
@@ -59,7 +77,7 @@ const OrderSummary = () => {
           className='flex w-full items-center justify-center rounded-lg bg-[rgba(255,215,0,0.9)] px-5 py-3 text-sm font-medium text-[rgba(44,44,84,0.9)] hover:bg-[rgba(255,215,0,0.7)] focus:outline-none focus:ring-4 focus:ring-[rgba(255,215,0,0.8)] transition-all'
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-        // onClick={handlePayment}
+        onClick={handlePayment}
         >
           Proceed to Checkout
         </motion.button>

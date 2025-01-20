@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAnalytics } from '../controllers/analytics.controller.js';
+import { getAnalytics, getDailySalesData } from '../controllers/analytics.controller.js';
 import { adminRoute, protectedRoute } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -7,9 +7,11 @@ const router = express.Router();
 router.get('/', protectedRoute, adminRoute, async (req, res) => {
     try {
         const analyticsData = await getAnalytics();
-        const endData = new Date();
 
-        const dailySalesData = await getDailySalesData(startDate, endData);
+       
+        const endDate = new Date();
+        const startDate=new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const dailySalesData = await getDailySalesData(startDate, endDate);
 
         res.json(
             {

@@ -4,7 +4,7 @@ import { stripe } from "../payments/stripe.config.js";
 import Order from "../models/order.models.js";
 export const checkoutSession = async (req, res) => {
     try {
-        const {listOfProducts,couponCode} = req.body;
+        const {listOfProducts,code} = req.body;
         if(!listOfProducts) 
         {
             return res.status(404).json({
@@ -31,7 +31,7 @@ export const checkoutSession = async (req, res) => {
                     product_data: {
                         name: product.name,
                         description: product.description,
-                        images: [product.images.url]
+                        images: [product.image]
                     },
                     unit_amount: product.price * 100
                 },
@@ -40,10 +40,10 @@ export const checkoutSession = async (req, res) => {
         });
 
         let coupon=null;
-        if(couponCode)
+        if(code)
         {
             coupon=await Coupon.findOne({
-                code:couponCode,
+                code:code,
                 $or:[{userId:req.user._id},
                     {userId:null}],
                 isActive:true
@@ -72,19 +72,19 @@ export const checkoutSession = async (req, res) => {
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${ENV_VARS.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${ENV_VARS.CLIENT_URL}/cancel`,
+            success_url: `${ENV_VARS.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${ENV_VARS.CLIENT_URL}/purchase-cancel`,
             discounts: coupon?[{coupon:await createStripeCoupon(coupon.discountPercentage)}]:[],
             metadata: {
-                userId: req.user._id,
+                userId: req.user._id.toString(),
                 products: JSON.stringify(
                     listOfProducts.map((product) => ({
-                        id: product._id,
+                        id: product._id.toString(),
                         quantity: product.quantity ,
                         price: product.price 
                     }))
                 ),
-                coupon: coupon?coupon.code:null
+                coupon: coupon?coupon.code.toString():null
             }
         });
 
@@ -121,8 +121,8 @@ async function createStripeCoupon(discountPercentage) {
 async function createCoupon(userId)
 {
     const coupon = await Coupon.create({
-        name:'GIFT',
-        code:'GIFT'+Math.floor(Math.random() * 10000),
+        name:'GIFTY'+Math.floor(Math.random() * 10000),
+        code:'GIFTY'+Math.floor(Math.random() * 10000),
         discountPercentage:10,
         expiryDate:new Date(Date.now()+6*30*24*60*60*1000),
         userId
@@ -133,7 +133,9 @@ async function createCoupon(userId)
 
 export const checkoutSuccess = async (req, res) => {
     try {
-        const {sessionId} = req.id;
+        const {sessionId} = req.body;
+        
+        console.log(sessionId,sessionId.length);
         if(!sessionId)
         {
             return res.status(404).json({
@@ -150,16 +152,17 @@ export const checkoutSuccess = async (req, res) => {
                 await Coupon.findOneAndUpdate({code:session.metadata.coupon},{isActive:false});
             }
             let products=null;
+            console.log(session.metadata.userId);
             products = JSON.parse(session.metadata.products);
             const newOrder = new Order({
-                userId: session.metadata.userId,
+                user: session.metadata.userId,
                 products:products.map((product) => ({
-                    productId: product.id,
+                    product: product.id,
                     quantity: product.quantity,
                     price: product.price
                 })),
                 totalAmount: session.amount_total,
-                stripePaymentId: session.payment_intent
+                stripeSessionId: sessionId
             });
             await newOrder.save();
             return res.status(200).json({

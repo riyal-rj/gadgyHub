@@ -33,10 +33,10 @@ export const getCoupons = async (req, res) => {
 export const validateCoupon = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { couponCode } = req.body;
+        const { code } = req.body;
 
         const coupon = await Coupon.findOne({
-            code: couponCode,
+            code: code,
             $or: [
                 { userId: userId, isActive: true },  // Personalized coupons
                 { userId: null, isActive: true }     // Global coupons

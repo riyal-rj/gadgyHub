@@ -1,4 +1,7 @@
+import { useEffect } from "react";
 import CategoryItem from "../components/CategoryItem";
+import { useProductStore } from "../store/productStore";
+import FeaturedProducts from "../components/FeaturedProducts";
 
 const categories = [
   { href: "/Electronics", name: "Electronics", imageUrl: "/electronics.webp" },
@@ -10,6 +13,12 @@ const categories = [
 ];
 
 const Home = () => {
+  const { products,fetchFeaturedProducts,loading } = useProductStore();
+  
+  useEffect(() => {
+    fetchFeaturedProducts();
+  },[fetchFeaturedProducts]);
+
   return (
     <div className='relative min-h-screen text-[rgba(255,215,0,0.9)] overflow-hidden bg-[rgba(44,44,84,0.9)]'>
       <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
@@ -30,7 +39,7 @@ const Home = () => {
         </div>
 
         {/* Optional Featured Products */}
-        {/* {!isLoading && products.length > 0 && <FeaturedProducts featuredProducts={products} />} */}
+        {!loading && products.length > 0 && <FeaturedProducts featuredProducts={products} />}
       </div>
     </div>
 

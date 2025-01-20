@@ -15,7 +15,7 @@ export const getAnalytics = async (req, res) => {
         }]);
 
         const {totalSales,totalRevenue}=salesData[0]||{totalSales:0,totalRevenue:0};
-
+        console.log(totalSales,totalRevenue,totalUsers,totalProducts);
         return {
             users:totalUsers,
             products:totalProducts,
@@ -24,8 +24,9 @@ export const getAnalytics = async (req, res) => {
         };
 };
 
-export const getDailySalesData=async(req,res)=>{
+export const getDailySalesData=async(startDate,endDate)=>{
     try{
+
         const dailySalesData=await Order.aggregate([
         {
             $match:{
@@ -47,9 +48,9 @@ export const getDailySalesData=async(req,res)=>{
         },
     ]);
           
-    const dateArray=getDatesInRange(startDate,endDate);
+    const dates=getDatesInRange(startDate,endDate);
 
-    return dateArray.map((date)=>{
+    return dates.map((date)=>{
         const foundData=dailySalesData.find((data)=>data._id===date);
         return {
             date,
@@ -65,13 +66,13 @@ export const getDailySalesData=async(req,res)=>{
 };
 
 function getDatesInRange(startDate, endDate) {
-    const dateArray = [];
-    let currentDate = startDate;
+    const dates = [];
+    let currentDate = new Date(startDate);
   
     while (currentDate <= endDate) {
-      dateArray.push(currentDate.toISOString().split("T")[0]);
+      dates.push(currentDate.toISOString().split("T")[0]);
       currentDate.setDate(currentDate.getDate() + 1);
     }
   
-    return dateArray;
+    return dates;
   }

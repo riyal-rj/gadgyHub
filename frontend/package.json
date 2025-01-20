@@ -12,6 +12,7 @@
   "dependencies": {
     "@stripe/stripe-js": "^5.5.0",
     "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
     "framer-motion": "^11.18.0",
     "lucide-react": "^0.471.1",
     "react": "^18.3.1",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.7",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
