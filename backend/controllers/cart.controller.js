@@ -6,13 +6,14 @@ export const getAllProdsFromCart = async (req, res) => {
         const products = await Product.find({ _id: { $in: req.user.cartItems } });
        
          const cartItems=products.map((product) => ({
-            id: product._id,
+            _id: product._id,
             name: product.name,
             price: product.price,
+            description: product.description,
             quantity: req.user.cartItems.find((item) => item.equals(product._id)).quantity,
-            image: product.images
+            image: product.image
         }));
-
+        console.log(cartItems);
         res.status(200).json({
             status: "success",
             message: "Products fetched successfully from cart",
@@ -69,8 +70,16 @@ export const addToCart = async (req, res) => {
 
 export const removeAllFromCart = async (req, res) => {
     try {
+        const {productId} = req.body;
         const user = req.user;
-        user.cartItems = [];
+        if(!productId)
+        {
+            user.cartItems = [];
+        }
+        else
+        {
+            user.cartItems = user.cartItems.filter(item => item.id !== productId);
+        }
         await user.save();
         res.status(200).json({  
             status: "success",

@@ -2,39 +2,41 @@ import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import CartItem from "../components/CartItem";
-import PeopleAlsoBought from "../components/PeopleAlsoBought";
+import RecommendedProducts from "../components/RecommendedProducts";
 import OrderSummary from "../components/OrderSummary";
 import CouponCard from "../components/CouponCard";
+import { useCartStore } from "../store/cartStore";
 
 const CartPage = () => {
-    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const {cartItems} = useCartStore();
+    console.log(cartItems);
   return (
     <div className='py-8 md:py-16 bg-gradient-to-b from-[rgba(44,44,84,1)] via-[rgba(44,44,84,0.9)] to-[rgba(44,44,84,0.8)] text-[rgba(255,215,0,0.9)]'>
   <div className='mx-auto max-w-screen-xl px-4 2xl:px-0'>
     <div className='mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8'>
       {/* Cart Items Section */}
       <motion.div
-        className='mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl bg-[rgba(44,44,84,0.9)] rounded-lg shadow-lg p-6'
+        className='mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl bg-[rgba(63,63,144,0.9)] rounded-lg shadow-lg p-6'
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        {cart.length === 0 ? (
+        {cartItems.length === 0 ? (
           <EmptyCartUI />
         ) : (
           <div className='space-y-6'>
-            {cart.map((item: any) => (
+            {cartItems.map((item) => (
               <CartItem key={item._id} item={item} />
             ))}
           </div>
         )}
-        {cart.length > 0 && <PeopleAlsoBought />}
+        {cartItems.length > 0 && <RecommendedProducts />}
       </motion.div>
 
       {/* Order Summary Section */}
-      {cart.length > 0 && (
+      {cartItems.length > 0 && (
         <motion.div
-          className='mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full bg-[rgba(44,44,84,0.9)] rounded-lg shadow-lg p-6'
+          className='mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full bg-[rgba(58,58,134,0.9)] rounded-lg shadow-lg p-6'
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}

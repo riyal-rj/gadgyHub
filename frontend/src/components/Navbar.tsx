@@ -1,8 +1,11 @@
 import { ShoppingCart, UserPlus2, LogIn, LogOut, Lock,ComputerIcon} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore.ts';
+import { useCartStore } from '../store/cartStore.ts';
 const Navbar = () => {
     const {user,logout} = useAuthStore();
+    const {cartItems}=useCartStore();
+    console.log(cartItems);
     const isAdmin=user?.role==='admin';
     return (
         <header className='fixed top-0 left-0 w-full bg-[rgba(72,61,139,0.9)] bg-opacity-90 

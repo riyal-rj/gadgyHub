@@ -17,19 +17,21 @@ interface Products{
 type productState={
     products:Products[],
     loading:boolean,
-  
+    recomendedProducts:Products[],
     setProducts:(products:Products[])=>void,
     addProduct:(productData:Products)=>void,
     deleteProduct:(productId:string)=>void,
     toggleFeaturedProduct:(productId:string)=>void,
     fetchAllProducts:()=>void,
     fetchProductsByCategory:(category:string)=>void
+    fetchRecommendedProducts:()=>void
     
 }
 
 export const useProductStore=create<productState>((set)=>({
     products:[],
     loading:false,
+    recomendedProducts:[],
     setProducts:(products)=>set({products}),
 
     addProduct:async(productData)=>{
@@ -135,5 +137,17 @@ export const useProductStore=create<productState>((set)=>({
                 toast.error('Unexpected error occurred');
             }
         }
-    }
+    },
+    fetchRecommendedProducts: async () => {
+        set({ loading: true });
+        try {
+            const res = await axiosInstance.get('/products/recommended');
+            set({ recomendedProducts: res.data.data, loading: false });
+        } catch (error) {
+            set({ loading: false });
+            if (axios.isAxiosError(error) && error.response) {
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+        }
+    },
 }))

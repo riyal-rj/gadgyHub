@@ -1,14 +1,16 @@
-import { BarChart4,PlusSquare,ShoppingBasket } from "lucide-react";
+import { BarChart4,PlusSquare,ShoppingBasket,LucideGift } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AddProductForm from "../components/AddProductForm";
 import ProductList from "../components/ProductList";
 import Analytics from "../components/Analytics";
 import { useProductStore } from "../store/productStore";
+import GiftCoupon from "../components/GiftCoupon";
 const tabs=[
     {id:"add",label:'Add Product',icon:PlusSquare},
     {id:"products",label:'Products',icon:ShoppingBasket},
-    {id:'analytics',label:'Analytics',icon:BarChart4}
+    {id:'analytics',label:'Analytics',icon:BarChart4},
+    {id:'coupons',label:'Coupons',icon:LucideGift}
 ]
 const AdminPage = () => {
     const {fetchAllProducts}=useProductStore();
@@ -53,6 +55,7 @@ const AdminPage = () => {
     {activeTab === "add" && <AddProductForm />}
     {activeTab === "products" && <ProductList />}
     {activeTab === "analytics" && <Analytics />}
+    {activeTab === "coupons" && <GiftCoupon/>}
   </div>
 </div>
 

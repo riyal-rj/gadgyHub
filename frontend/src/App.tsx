@@ -20,6 +20,8 @@ function App() {
   },[checkAuth]);
 
   useEffect(() => {
+    if(!user)
+      return;
     getCartItems();
   },[getCartItems]);
 

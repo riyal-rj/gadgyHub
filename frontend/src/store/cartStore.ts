@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import axiosInstance from '../lib/axios';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import {persist} from 'zustand/middleware';
 
 type Cart = {
     _id: string,
@@ -15,7 +16,11 @@ type Cart = {
     quantity: number
 }
 type Coupon = {
-    discount: number;
+    _id: string,
+    name: string,
+    code: string,
+    discountPercentage: number,
+    expiryDate: Date
 }
 interface CartState {
     cartItems: Cart[];
@@ -33,7 +38,9 @@ interface CartState {
     updateQuantity: (id: string, quantity: number) => void,
     clearCart: () => void,
 }
-export const useCartStore = create<CartState>((set, get) => ({
+export const useCartStore = create<CartState>()(
+    persist(
+        (set, get) => ({
     cartItems: [],
     coupon: null,
     totalAmount: 0,
@@ -77,7 +84,8 @@ export const useCartStore = create<CartState>((set, get) => ({
     getCartItems: async () => {
         try {
             const res = await axiosInstance.get('/cart');
-            set({ cartItems: res.data.data.cart });
+            console.log(res.data.data);
+            set({ cartItems: res.data.data });
             get().calculateTotalAmount();
         }
         catch (error) {
@@ -93,13 +101,15 @@ export const useCartStore = create<CartState>((set, get) => ({
     clearCart: async () => {
         set({ cartItems: [], coupon: null, totalAmount: 0, subtotalAmount: 0 });
     },
-    addToCart: async (product: Cart) => {
+    addToCart: async (product) => {
         try {
+            console.log(product);
             await axiosInstance.post('/cart', { productId: product._id });
             toast.success('Product added to cart successfully');
 
             set((previousState) => {
                 const existingItem = previousState.cartItems.find(item => item._id === product._id);
+                // console.log(existingItem);
                 const newCart = existingItem ?
                     previousState.cartItems.map(item =>
                         item._id === product._id ?
@@ -108,6 +118,7 @@ export const useCartStore = create<CartState>((set, get) => ({
                     )
                     :
                     [...previousState.cartItems, { ...product, quantity: 1 }];
+                    console.log(newCart);
                 return { cartItems: newCart };
             });
             get().calculateTotalAmount();
@@ -115,39 +126,30 @@ export const useCartStore = create<CartState>((set, get) => ({
             if (axios.isAxiosError(error) && error.response) {
                 return toast.error(error.response.data.message || 'Something went wrong');
             }
-            else {
-                toast.error('Unexpected error occurred');
-            }
         }
     },
 
     removeFromCart: async (productId: string) => {
-        try {
             await axiosInstance.delete(`/cart/`, { data: { productId } });
             set((previousState) => ({
                 cartItems: previousState.cartItems.filter(item => item._id !== productId),
             }));
             get().calculateTotalAmount();
-            toast.success('Product removed from cart successfully');
-        } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                return toast.error(error.response.data.message || 'Something went wrong');
-            }
-            else {
-                toast.error('Unexpected error occurred');
-            }
-        }
+           
     },
 
     updateQuantity: async (productId: string, quantity: number) => {
+        console.log(productId, quantity);
         if (quantity === 0) {
             get().removeFromCart(productId);
             return;
         }
         else {
+            console.log(productId);
             const res = await axiosInstance.put(`/cart/${productId}`, { quantity });
+            console.log(res.data);
             set(previousState => ({
-                cartItems: previousState.cartItems.map(item => item._id === productId ? res.data.data : item),
+                cartItems: previousState.cartItems.map(item => item._id === productId ? { ...item, quantity } : item),
             }));
             get().calculateTotalAmount();
             toast.success('Quantity updated successfully');
@@ -165,15 +167,16 @@ export const useCartStore = create<CartState>((set, get) => ({
         let totalAmount = subtotalAmount;
 
         if (coupon) {
-            const discount = (totalAmount * coupon.discount) / 100;
+            const discount = (totalAmount * coupon.discountPercentage) / 100;
             totalAmount -= discount;
         }
 
         set({ subtotalAmount, totalAmount });
 
     },
-
-
-
-
-}))
+}),
+{
+    name: 'cart-storage',
+    partialize: (state) => ({ cartItems: state.cartItems , coupon: state.coupon, totalAmount: state.totalAmount, subtotalAmount: state.subtotalAmount, isCouponApplied: state.isCouponApplied }),
+}
+));
