@@ -17,18 +17,25 @@ type Coupon = {
     _id: string,
     name: string,
     code: string,
-    discountPercentage: number,
-    expiryDate: Date
+    assignedTo:string,
+    discountPercentage: string,
+    expiryDate: string,
+    isActive: boolean
 }
 interface CartState {
     cartItems: Cart[];
     coupon: Coupon | null,
+    couponList: Coupon[],
     totalAmount: number,
     subtotalAmount: number,
     isCouponApplied: boolean,
     addToCart: (product: Cart) => void,
     removeFromCart: (id: string) => void,
     getCoupon: () => void,
+    fetchAllCoupons: () => void,
+    deleteCoupon: (couponId: string) => void,
+    toggleCoupon: (couponId: string) => void,
+    createCoupon: (coupon: Coupon) => void,
     applyCoupon: (couponCode: string) => void,
     removeCoupon: () => void,
     getCartItems: () => void,
@@ -38,6 +45,7 @@ interface CartState {
 }
 export const useCartStore = create<CartState>((set, get) => ({
     cartItems: [],
+    couponList: [],
     coupon: null,
     totalAmount: 0,
     subtotalAmount: 0,
@@ -56,6 +64,58 @@ export const useCartStore = create<CartState>((set, get) => ({
             }
             else {
                 toast.error('Unexpected error occurred');
+            }
+        }
+    },
+    fetchAllCoupons: async () => {
+        try {
+            const res = await axiosInstance.get(`/coupons/all`);
+            const couponList = res.data;
+            console.log(couponList);
+            set({ couponList: couponList });
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+        }
+    },
+    toggleCoupon: async (couponId: string) => {
+        try {
+            const res = await axiosInstance.patch(`/coupons/${couponId}`);
+            set((previousState) => ({
+                couponList: previousState.couponList.map(coupon => coupon._id === couponId ? { ...coupon, isActive: !coupon.isActive } : coupon),
+            }));
+            toast.success(res.data.message);
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+        }
+    },
+    createCoupon: async (coupon: Coupon) => {
+        try {
+            const res = await axiosInstance.post('/coupons/create', coupon);
+            set((previousState) => ({
+                couponList: [...previousState.couponList, res.data.data],
+            }));
+            toast.success(res.data.message);
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                return toast.error(error.response.data.message || 'Something went wrong');
+            }
+        }
+    },
+    deleteCoupon: async (couponId: string) => {
+        try {
+            const res = await axiosInstance.delete(`/coupons/del/${couponId}`);
+            set((previousState) => ({
+                couponList: previousState.couponList.filter(coupon => coupon._id !== couponId),
+            }));
+            toast.success(res.data.message);
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {  // Check if error is an axios error
+                return toast.error(error.response.data.message || 'Something went wrong');
             }
         }
     },
@@ -179,7 +239,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         let totalAmount = subtotalAmount;
 
         if (coupon) {
-            const discount = (totalAmount * coupon.discountPercentage) / 100;
+            const discount = (totalAmount * Number(coupon.discountPercentage)) / 100;
             totalAmount -= discount;
         }
 

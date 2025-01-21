@@ -79,7 +79,7 @@ export const validateCoupon = async (req, res) => {
 
 export const createCoupon = async (req, res) => {
     try {
-        const { name, code, discountPercentage, expiryDate, userId } = req.body;
+        const { name, code, discountPercentage, expiryDate } = req.body;
         if (!name || !code || !discountPercentage || !expiryDate) {
             return res.status(404).json({
                 status: "failed",
@@ -92,7 +92,6 @@ export const createCoupon = async (req, res) => {
             code,
             discountPercentage,
             expiryDate,
-            userId
         });
 
         await newCoupon.save();
@@ -128,3 +127,48 @@ export const deleteCoupon = async (req, res) => {
         })
     }
 }
+
+export const fetchAllCoupons = async (req, res) => {
+    try {
+        const coupons = await Coupon.find().populate("userId", "username -_id");
+        const couponList = coupons.map(coupon => ({
+            ...coupon._doc,
+            assignedTo: coupon.userId ? coupon.userId.username : "Global Coupon"
+        }));
+        res.status(200).json(couponList);
+
+      } catch (error) {
+        console.log('Error in fetchAllCoupon controller : ' + error.message);
+        return res.status(500).json({
+            status: "failed",
+            message: error.message
+        })
+      }
+}
+
+export const toggleCouponStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const coupon = await Coupon.findById(id);
+        if (!coupon) {
+            return res.status(404).json({
+                status: "failed",
+                message: "Coupon not found"
+            })
+        }
+        coupon.isActive = !coupon.isActive;
+        await coupon.save();
+        res.status(200).json({
+            status: "success",
+            message: "Coupon status toggled successfully",
+            data: coupon
+        })
+    } catch (error) {
+        console.log('Error in toggleCouponStatus controller : ' + error.message);
+        return res.status(500).json({
+            status: "failed",
+            message: error.message
+        })
+    }
+}
+
