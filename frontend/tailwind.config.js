@@ -14,7 +14,17 @@ export default {
         "text-muted": "#9CA3AF",
         icon: "#6B7280",
       },
+      keyframes: {
+        glow: {
+          '0%, 100%': { textShadow: '0 0 8px rgba(255,215,0,0.9), 0 0 16px rgba(255,215,0,0.7)' },
+          // '50%': { textShadow: '0 0 12px rgba(255,215,0,1), 0 0 24px rgba(255,215,0,0.9)' },
+        },
+      },
+      animation: {
+        glow: 'glow 1.5s ease-in-out infinite',
+      },  
     },
+    
   },
   plugins: [],
 }
