@@ -45,6 +45,11 @@ The GadgyHub application is a modern e-commerce platform dedicated to selling el
 - **Recharts**: Charting library for data visualization.
 - **React Confetti**: Adds interactive and engaging celebratory effects.
 
+### API Testing
+- **Postman**: Build tool for fast development.
+
+### MongoDB Compass
+- **MongoDB Compass**: Database visualization tool.
 ---
 
 ## Getting Started
