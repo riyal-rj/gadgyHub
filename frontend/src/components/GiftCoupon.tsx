@@ -29,7 +29,7 @@ const GiftCoupon = () => {
         <h1 className='text-3xl font-bold text-[rgba(255,215,0,0.9)] mb-8'>Manage Coupons</h1>
 
         {/* Coupon Form */}
-        <div className='bg-[rgba(44,44,84,0.9)] p-6 rounded-lg shadow-lg mb-12'>
+        <div className='bg-[rgba(55,55,130,0.9)] p-6 rounded-lg shadow-lg mb-12'>
           <h2 className='text-lg font-semibold text-[rgba(255,215,0,0.9)] mb-4'>Create New Coupon</h2>
           <form onSubmit={handleSubmit} className='space-y-4'>
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
@@ -90,7 +90,7 @@ const GiftCoupon = () => {
         </div>
 
         {/* Coupons Table */}
-        <div className='bg-[rgba(44,44,84,0.9)] p-6 rounded-lg shadow-lg'>
+        <div className='bg-[rgba(52,52,124,0.9)] p-6 rounded-lg shadow-lg'>
           <h2 className='text-lg font-semibold text-[rgba(255,215,0,0.9)] mb-4'>Available Coupons</h2>
           <table className='w-full text-left border-collapse'>
             <thead>
