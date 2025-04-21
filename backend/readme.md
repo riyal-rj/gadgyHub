@@ -69,7 +69,7 @@ This document provides detailed explanations of the API routes implemented in th
 - **DELETE `/`**
   - **Middleware:** `protectedRoute`
   - **Controller:** `removeAllFromCart`
-  - **Description:** Removes all items from the user's cart.
+  - **Description:** Removes the very item from the user's cart.
 
 - **PUT `/:id`**
   - **Middleware:** `protectedRoute`
